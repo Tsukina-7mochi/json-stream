@@ -1,0 +1,14 @@
+{
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "indentWidth": 2,
+    "lineWidth": 80,
+    "proseWrap": "always",
+    "singleQuote": true,
+    "useTabs": false
+  }
+}
