@@ -10,5 +10,8 @@
     "proseWrap": "always",
     "singleQuote": true,
     "useTabs": false
+  },
+  "tasks": {
+    "parse:deno": "cat deno.json | deno run main.ts"
   }
 }
