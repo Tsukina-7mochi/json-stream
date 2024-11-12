@@ -1,7 +1,7 @@
 import type { Token } from './json.ts';
 
 const numberRegexp = /^-?(0|[1-9]\d*)(\.\d+)?([eE][+\-]?\d+)?/;
-const partialRevNumberRegexp = /(\d+[+\-]?[eE])?(\d+\.)?((\d*[1-9])|0)-?$/;
+const partialRevNumberRegexp = /^(\d+[+\-]?[eE])?(\d+\.)?((\d*[1-9])|0)-?$/;
 
 const parseChunk = function (chunk: string): [Token | null, string] {
   if (chunk.length === 0) return [null, chunk];
@@ -58,15 +58,15 @@ const parseChunk = function (chunk: string): [Token | null, string] {
     }
   }
 
+  if (partialRevNumberRegexp.test([...chunk].reverse().join())) {
+    return [null, chunk];
+  }
   const numberMatch = chunk.match(numberRegexp);
   if (numberMatch?.[0]) {
     return [{
       kind: 'number-literal',
       value: Number(numberMatch[0]),
     }, chunk.slice(numberMatch[0].length)];
-  }
-  if (partialRevNumberRegexp.test([...chunk].reverse().join())) {
-    return [null, chunk];
   }
 
   throw Error(`Unexpected chunk: ${chunk}`);
@@ -94,9 +94,10 @@ const transformOptions = function () {
       }
     }
   };
-  const flush = function () {
+  const flush = function (controller: TransformStreamDefaultController) {
+    transform('', controller);
     if (chunk.length > 0) {
-      throw Error('Undefined EOF');
+      throw Error('Unexpected EOF');
     }
   };
 

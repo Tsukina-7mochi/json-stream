@@ -1,4 +1,6 @@
 import { TokenizerStream } from './src/tokenizerStream.ts';
+import { parse, type TreeValueToken } from './src/parser.ts';
+import { asyncIteratorToTransformStream } from './src/asyncIteratorToTransformStream.ts';
 
 const splitToCharactersStream = () => {
   return new TransformStream({
@@ -10,14 +12,17 @@ const splitToCharactersStream = () => {
   });
 };
 
-Deno.stdin.readable
+const consoleLogWriter = () => {
+  return new WritableStream<TreeValueToken>({
+    write(value) {
+      console.log(`.${value.path.join('.')}`, value.token);
+    },
+  });
+};
+
+await Deno.stdin.readable
   .pipeThrough(new TextDecoderStream())
-  // .pipeThrough(splitToCharactersStream())
+  .pipeThrough(splitToCharactersStream())
   .pipeThrough(new TokenizerStream())
-  .pipeTo(
-    new WritableStream({
-      write(token) {
-        console.log(token);
-      },
-    }),
-  );
+  .pipeThrough(asyncIteratorToTransformStream(parse))
+  .pipeTo(consoleLogWriter());
