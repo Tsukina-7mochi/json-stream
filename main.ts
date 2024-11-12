@@ -1,6 +1,7 @@
 import { TokenizerStream } from './src/tokenizerStream.ts';
 import { parse, type TreeValueToken } from './src/parser.ts';
 import { asyncIteratorToTransformStream } from './src/asyncIteratorToTransformStream.ts';
+import { SelectorStream } from './src/selectorStream.ts';
 
 const splitToCharactersStream = () => {
   return new TransformStream({
@@ -25,4 +26,5 @@ await Deno.stdin.readable
   .pipeThrough(splitToCharactersStream())
   .pipeThrough(new TokenizerStream())
   .pipeThrough(asyncIteratorToTransformStream(parse))
+  .pipeThrough(new SelectorStream('.fmt.*'))
   .pipeTo(consoleLogWriter());
