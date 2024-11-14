@@ -1,4 +1,4 @@
-import type { WalkValue } from './parser.ts';
+import type { TreeValueToken } from './parserStream.ts';
 
 type Path = (string | number)[];
 
@@ -37,8 +37,8 @@ const pathMatch = function (path: Path, filterPath: Path): boolean {
 const transformOptions = (selector: string) => {
   const filterPath = parseSelector(selector);
   const transform = (
-    value: WalkValue,
-    controller: TransformStreamDefaultController<WalkValue>,
+    value: TreeValueToken,
+    controller: TransformStreamDefaultController<TreeValueToken>,
   ) => {
     if (pathMatch(value.path, filterPath)) {
       controller.enqueue(value);
@@ -48,7 +48,8 @@ const transformOptions = (selector: string) => {
   return { transform };
 };
 
-export class SelectorStream extends TransformStream<WalkValue, WalkValue> {
+export class SelectorStream
+  extends TransformStream<TreeValueToken, TreeValueToken> {
   constructor(selector: string) {
     super({ ...transformOptions(selector) });
   }

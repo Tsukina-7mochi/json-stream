@@ -1,5 +1,6 @@
 import type { Token } from './json.ts';
 import { AsyncPeekableIterator } from './asyncPeekableIterator.ts';
+import { asyncIteratorToTransformStream } from './asyncIteratorToTransformStream.ts';
 
 type Path = (string | number)[];
 export type TreeValueToken = {
@@ -96,4 +97,8 @@ const parseValue = async function* (
 
 export const parse = async function* (iter: AsyncIterator<Token>) {
   yield* parseValue([], new AsyncPeekableIterator(iter));
+};
+
+export const parserStream = () => {
+  return asyncIteratorToTransformStream(parse);
 };
