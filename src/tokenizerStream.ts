@@ -47,11 +47,11 @@ const parseChunk = function (chunk: string): [Token | null, string] {
   }
 
   if (chunk[0] === '"') {
-    const endIndex = chunk.indexOf('"', 1);
-    if (endIndex > 0) {
+    const endIndex = chunk.slice(1).match(/(?<!\\)"/)?.index;
+    if (typeof endIndex === 'number') {
       return [
-        { kind: 'string-literal', value: chunk.slice(1, endIndex) },
-        chunk.slice(endIndex + 1),
+        { kind: 'string-literal', value: chunk.slice(1, endIndex + 1) },
+        chunk.slice(endIndex + 2),
       ];
     } else {
       return [null, chunk];
