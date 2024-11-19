@@ -1,11 +1,10 @@
-export const asyncIteratorToTransformStream = function <I, O>(
-  transformer: (iter: AsyncIterator<I>) => AsyncIterable<O>,
-): TransformStream<I, O> {
-  const inputBufferStream = new TransformStream<I, I>();
+export const asyncIteratorToTransformStream = function <In, Out>(
+  transformer: (iter: AsyncIterator<In>) => AsyncIterable<Out>,
+): TransformStream<In, Out> {
+  const inputBufferStream = new TransformStream<In, In>();
   const inputWriter = inputBufferStream.writable.getWriter();
 
-  let controller: TransformStreamDefaultController<O> | null = null;
-  const queue: O[] = [];
+  const queue: Out[] = [];
   let endPromiseResolve: (() => void) | undefined;
   const endPromise = new Promise<void>((resolve) => {
     endPromiseResolve = resolve;
@@ -19,18 +18,16 @@ export const asyncIteratorToTransformStream = function <I, O>(
   })();
 
   const transform = async (
-    input: I,
-    newController: TransformStreamDefaultController,
+    input: In,
+    controller: TransformStreamDefaultController,
   ) => {
-    controller = newController;
     while (queue.length > 0) {
       controller.enqueue(queue.shift());
     }
 
     await inputWriter.write(input);
   };
-  const flush = async (newController: TransformStreamDefaultController) => {
-    controller = newController;
+  const flush = async (controller: TransformStreamDefaultController) => {
     while (queue.length > 0) {
       controller.enqueue(queue.shift());
     }
