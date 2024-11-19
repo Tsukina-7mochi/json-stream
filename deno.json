@@ -12,6 +12,8 @@
     "useTabs": false
   },
   "tasks": {
-    "parse:deno": "cat deno.json | deno run main.ts"
+    "run": "deno run --allow-read main.ts gh.json '.*.name'",
+    "run:deno": "cat deno.json | deno run main.ts '.fmt.*'",
+    "download": "curl -sSL https://api.github.com/orgs/increments/repos > gh.json"
   }
 }

@@ -20,10 +20,10 @@ const consoleLogWriter = () => {
   });
 };
 
-await Deno.stdin.readable
+await (await Deno.open(Deno.args[0])).readable
   .pipeThrough(new TextDecoderStream())
-  .pipeThrough(splitToCharactersStream())
+  // .pipeThrough(splitToCharactersStream())
   .pipeThrough(new TokenizerStream())
   .pipeThrough(parserStream())
-  .pipeThrough(new SelectorStream('.fmt.*'))
+  .pipeThrough(new SelectorStream(Deno.args[1]))
   .pipeTo(consoleLogWriter());
